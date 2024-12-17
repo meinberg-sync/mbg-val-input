@@ -80,3 +80,22 @@ Int64WithDefault.args = {
   defaultVal: '-42',
   label: 'INT64 (Default: -42)',
 };
+
+export const Float32 = Template.bind({});
+Float32.args = {
+  bType: 'FLOAT32',
+  label: 'FLOAT32',
+};
+
+export const Float32WithDefault = Template.bind({});
+Float32WithDefault.args = {
+  bType: 'FLOAT32',
+  defaultVal: '3.14',
+  label: 'FLOAT32 (Default: 3.14)',
+};
+
+export const Float64 = Template.bind({});
+Float64.args = {
+  bType: 'FLOAT64',
+  label: 'FLOAT64',
+};
