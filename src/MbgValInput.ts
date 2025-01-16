@@ -10,6 +10,19 @@ function xmlBoolean(val?: string) {
   return ['true', '1'].includes(val?.toLowerCase().trim() ?? 'false');
 }
 
+function isValidBigInt(value: bigint, size: 64 | 128): boolean {
+  if (size === 64) {
+    return value >= -9223372036854775808n && value <= 9223372036854775807n;
+  }
+  if (size === 128) {
+    return (
+      value >= -170141183460469231731687303715884105728n &&
+      value <= 170141183460469231731687303715884105727n
+    );
+  }
+  return false;
+}
+
 function isValidFloat(value: number, size: 32 | 64): boolean {
   if (size === 32) {
     return value >= -3.4028235e38 && value <= 3.4028235e38;
@@ -36,6 +49,66 @@ export class MbgValInput extends LitElement {
 
   @query('#input') input?: HTMLInputElement;
 
+  private sanitizeInt(value: string) {
+    let sanitized = '';
+
+    // allow leading negative sign
+    const signed = value[0] === '-' ? '-' : '';
+    const negative = signed === '-';
+
+    // remove leading zeros and invalid characters
+    sanitized = value.replace(/[^0-9]/g, '').replace(/^0+(?=\d)/, '');
+
+    if (negative) {
+      sanitized = signed + sanitized;
+    }
+
+    // set default value
+    if (sanitized === '') {
+      sanitized = this.default ?? '0';
+    } else if (sanitized === '-0') {
+      sanitized = '0';
+    }
+
+    return sanitized;
+  }
+
+  private handleBigIntInput(event: Event) {
+    const input = (event.target as HTMLInputElement).value;
+    const sanitizedInput = this.sanitizeInt(input);
+
+    // allow leading negative sign
+    if (sanitizedInput === '-') {
+      return;
+    }
+
+    const parsedValue = BigInt(sanitizedInput);
+
+    if (isValidBigInt(parsedValue, this.bType === 'INT128' ? 128 : 64)) {
+      this.value = sanitizedInput;
+      // eslint-disable-next-line no-param-reassign
+      (event.target as HTMLInputElement).value = sanitizedInput;
+    } else {
+      this.value = this.default ?? '0';
+      // eslint-disable-next-line no-param-reassign
+      (event.target as HTMLInputElement).value = this.default ?? '0';
+    }
+  }
+
+  private handleIntInput(event: Event) {
+    const input = (event.target as HTMLInputElement).value;
+
+    // allow leading negative sign
+    if (input === '-') {
+      return;
+    }
+
+    const int = Math.round(parseInt(input, 10));
+    this.value = int.toString();
+    // eslint-disable-next-line no-param-reassign
+    (event.target as HTMLInputElement).value = int.toString();
+  }
+
   intInput(size: 8 | 16 | 24 | 32 | 64 | 128, signed = true) {
     const min = signed ? -(2 ** (size - 1)) : 0;
     const max = signed ? 2 ** (size - 1) - 1 : 2 ** size - 1;
@@ -44,9 +117,9 @@ export class MbgValInput extends LitElement {
       return html`<md-outlined-text-field
         id="input"
         label="${this.label}"
-        type="number"
-        step="1"
+        type="text"
         value="${this.default ?? nothing}"
+        @input="${this.handleBigIntInput}"
       ></md-outlined-text-field>`;
     }
 
@@ -58,6 +131,7 @@ export class MbgValInput extends LitElement {
       min="${min}"
       max="${max}"
       value="${this.default ?? nothing}"
+      @input="${this.handleIntInput}"
     ></md-outlined-text-field>`;
   }
 
