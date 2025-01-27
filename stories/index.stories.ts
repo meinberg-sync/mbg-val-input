@@ -99,3 +99,16 @@ Float64.args = {
   bType: 'FLOAT64',
   label: 'FLOAT64',
 };
+
+export const VisString32 = Template.bind({});
+VisString32.args = {
+  bType: 'VisString32',
+  defaultVal: 'Hello World',
+  label: 'VisString32',
+};
+
+export const VisString255 = Template.bind({});
+VisString255.args = {
+  bType: 'VisString255',
+  label: 'VisString255',
+};

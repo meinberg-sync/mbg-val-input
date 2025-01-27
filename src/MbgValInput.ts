@@ -183,6 +183,17 @@ export class MbgValInput extends LitElement {
     `;
   }
 
+  stringInput(size: 32 | 64 | 65 | 129 | 255) {
+    return html`
+      <md-outlined-text-field
+        id="input"
+        label="${this.label}"
+        value="${this.default ?? nothing}"
+        maxlength="${size}"
+      ></md-outlined-text-field>
+    `;
+  }
+
   get value() {
     if (this.bType === 'BOOLEAN') {
       return (this.input as unknown as MdSwitch).selected ? 'true' : 'false';
@@ -212,6 +223,11 @@ export class MbgValInput extends LitElement {
       INT32U: this.intInput(32, false),
       FLOAT32: this.floatInput(),
       FLOAT64: this.floatInput(),
+      VisString32: this.stringInput(32),
+      VisString64: this.stringInput(64),
+      VisString65: this.stringInput(65),
+      VisString129: this.stringInput(129),
+      VisString255: this.stringInput(255),
     };
   }
 
