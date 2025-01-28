@@ -77,21 +77,26 @@ export class MbgValInput extends LitElement {
     const input = (event.target as HTMLInputElement).value;
     const sanitizedInput = this.sanitizeInt(input);
 
-    // allow leading negative sign
-    if (sanitizedInput === '-') {
-      return;
-    }
+    // validate input
+    if (/^-?\d*$/.test(sanitizedInput)) {
+      // allow leading negative sign
+      if (sanitizedInput === '-') {
+        this.value = sanitizedInput;
+        // eslint-disable-next-line no-param-reassign
+        (event.target as HTMLInputElement).value = sanitizedInput;
+        return;
+      }
 
-    const parsedValue = BigInt(sanitizedInput);
-
-    if (isValidBigInt(parsedValue, this.bType === 'INT128' ? 128 : 64)) {
-      this.value = sanitizedInput;
-      // eslint-disable-next-line no-param-reassign
-      (event.target as HTMLInputElement).value = sanitizedInput;
-    } else {
-      this.value = this.default ?? '0';
-      // eslint-disable-next-line no-param-reassign
-      (event.target as HTMLInputElement).value = this.default ?? '0';
+      const parsedValue = BigInt(sanitizedInput);
+      if (isValidBigInt(parsedValue, this.bType === 'INT128' ? 128 : 64)) {
+        this.value = sanitizedInput;
+        // eslint-disable-next-line no-param-reassign
+        (event.target as HTMLInputElement).value = sanitizedInput;
+      } else {
+        this.value = this.default ?? '0';
+        // eslint-disable-next-line no-param-reassign
+        (event.target as HTMLInputElement).value = this.default ?? '0';
+      }
     }
   }
 
