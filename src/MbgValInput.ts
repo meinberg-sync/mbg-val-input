@@ -49,6 +49,12 @@ export class MbgValInput extends LitElement {
 
   @query('#input') input?: HTMLInputElement;
 
+  private updateValue(event: Event, userValue: string) {
+    this.value = userValue;
+    // eslint-disable-next-line no-param-reassign
+    (event.target as HTMLInputElement).value = userValue;
+  }
+
   private sanitizeInt(value: string) {
     let sanitized = '';
 
@@ -81,21 +87,16 @@ export class MbgValInput extends LitElement {
     if (/^-?\d*$/.test(sanitizedInput)) {
       // allow leading negative sign
       if (sanitizedInput === '-') {
-        this.value = sanitizedInput;
-        // eslint-disable-next-line no-param-reassign
-        (event.target as HTMLInputElement).value = sanitizedInput;
+        this.updateValue(event, sanitizedInput);
         return;
       }
 
       const parsedValue = BigInt(sanitizedInput);
       if (isValidBigInt(parsedValue, this.bType === 'INT128' ? 128 : 64)) {
-        this.value = sanitizedInput;
-        // eslint-disable-next-line no-param-reassign
-        (event.target as HTMLInputElement).value = sanitizedInput;
+        this.updateValue(event, sanitizedInput);
       } else {
-        this.value = this.default ?? '0';
-        // eslint-disable-next-line no-param-reassign
-        (event.target as HTMLInputElement).value = this.default ?? '0';
+        // set default value
+        this.updateValue(event, this.default ?? '0');
       }
     }
   }
@@ -183,9 +184,7 @@ export class MbgValInput extends LitElement {
     if (/^-?\d*\.?\d*$/.test(sanitizedInput)) {
       // allow leading negative sign
       if (sanitizedInput === '-') {
-        this.value = sanitizedInput;
-        // eslint-disable-next-line no-param-reassign
-        (event.target as HTMLInputElement).value = sanitizedInput;
+        this.updateValue(event, sanitizedInput);
         return;
       }
 
@@ -194,13 +193,10 @@ export class MbgValInput extends LitElement {
         !Number.isNaN(parsedValue) &&
         isValidFloat(parsedValue, this.bType === 'FLOAT32' ? 32 : 64)
       ) {
-        this.value = sanitizedInput;
-        // eslint-disable-next-line no-param-reassign
-        (event.target as HTMLInputElement).value = sanitizedInput;
+        this.updateValue(event, sanitizedInput);
       } else {
-        this.value = this.default ?? '0';
-        // eslint-disable-next-line no-param-reassign
-        (event.target as HTMLInputElement).value = this.default ?? '0';
+        // set default value
+        this.updateValue(event, this.default ?? '0');
       }
     }
   }
@@ -233,9 +229,7 @@ export class MbgValInput extends LitElement {
   private handleOctetInput(event: Event) {
     const input = (event.target as HTMLInputElement).value;
     const sanitizedInput = this.sanitizeOctet(input);
-    this.value = sanitizedInput;
-    // eslint-disable-next-line no-param-reassign
-    (event.target as HTMLInputElement).value = sanitizedInput;
+    this.updateValue(event, sanitizedInput);
   }
 
   octetInput(size: 6 | 16 | 64) {
