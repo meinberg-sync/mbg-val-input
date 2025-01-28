@@ -183,6 +183,39 @@ export class MbgValInput extends LitElement {
     `;
   }
 
+  private sanitizeOctet(value: string) {
+    let sanitized = '';
+
+    // only allow hex digits
+    sanitized = value.replace(/[^0-9a-fA-F]/g, '');
+
+    if (sanitized === '') {
+      sanitized = this.default ?? '';
+    }
+
+    return sanitized;
+  }
+
+  private handleOctetInput(event: Event) {
+    const input = (event.target as HTMLInputElement).value;
+    const sanitizedInput = this.sanitizeOctet(input);
+    this.value = sanitizedInput;
+    // eslint-disable-next-line no-param-reassign
+    (event.target as HTMLInputElement).value = sanitizedInput;
+  }
+
+  octetInput(size: 6 | 16 | 64) {
+    return html`
+      <md-outlined-text-field
+        id="input"
+        label="${this.label}"
+        value="${this.default ?? nothing}"
+        maxlength="${size * 2}"
+        @input="${this.handleOctetInput}"
+      ></md-outlined-text-field>
+    `;
+  }
+
   stringInput(size: 32 | 64 | 65 | 129 | 255) {
     return html`
       <md-outlined-text-field
@@ -223,11 +256,15 @@ export class MbgValInput extends LitElement {
       INT32U: this.intInput(32, false),
       FLOAT32: this.floatInput(),
       FLOAT64: this.floatInput(),
+      Octet6: this.octetInput(6),
+      Octet16: this.octetInput(16),
+      Octet64: this.octetInput(64),
       VisString32: this.stringInput(32),
       VisString64: this.stringInput(64),
       VisString65: this.stringInput(65),
       VisString129: this.stringInput(129),
       VisString255: this.stringInput(255),
+      Unicode255: this.stringInput(255),
     };
   }
 

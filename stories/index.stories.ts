@@ -100,6 +100,20 @@ Float64.args = {
   label: 'FLOAT64',
 };
 
+export const Octet6 = Template.bind({});
+Octet6.args = {
+  bType: 'Octet6',
+  defaultVal: '0123456789AB',
+  label: 'Octet6',
+};
+
+export const Octet16 = Template.bind({});
+Octet16.args = {
+  bType: 'Octet16',
+  defaultVal: '0123456789ABCDEF0123456789ABCDEF',
+  label: 'Octet16',
+};
+
 export const VisString32 = Template.bind({});
 VisString32.args = {
   bType: 'VisString32',
