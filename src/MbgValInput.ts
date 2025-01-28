@@ -138,15 +138,33 @@ export class MbgValInput extends LitElement {
   private sanitizeFloat(value: string) {
     let sanitized = '';
 
-    if (value === 'e') {
+    // allow leading negative sign
+    const signed = value[0] === '-' ? '-' : '';
+    const negative = signed === '-';
+
+    if (value === 'e' || value === '-e') {
       // account for Euler's number
       sanitized = '2.7182818284590452354';
     } else {
       // remove leading zeros and invalid characters
-      sanitized = value.replace(/[^0-9.-]/g, '').replace(/^0+(?=\d)/, '');
-      if (sanitized === '') {
-        sanitized = this.default ?? '0';
-      }
+      sanitized = value.replace(/[^0-9.]/g, '').replace(/^0+(?=\d)/, '');
+    }
+
+    // track the number of decimal points
+    const numDecimalPoints = sanitized.split('.').length - 1;
+    if (numDecimalPoints > 1) {
+      // remove extra decimal points
+      sanitized = sanitized.replace(/\.(?=.*\.)/g, '');
+      // remove leading zeros
+      sanitized = sanitized.replace(/^0+(?=\d)/, '');
+    }
+
+    if (negative) {
+      sanitized = signed + sanitized;
+    }
+
+    if (sanitized === '') {
+      sanitized = this.default ?? '0';
     }
 
     return sanitized;
@@ -156,6 +174,11 @@ export class MbgValInput extends LitElement {
     const input = (event.target as HTMLInputElement).value;
     const sanitizedInput = this.sanitizeFloat(input);
     const parsedValue = parseFloat(sanitizedInput);
+
+    // allow leading negative sign
+    if (sanitizedInput === '-') {
+      return;
+    }
 
     if (
       !Number.isNaN(parsedValue) &&
