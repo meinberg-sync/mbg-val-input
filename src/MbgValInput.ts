@@ -178,24 +178,30 @@ export class MbgValInput extends LitElement {
   private handleFloatInput(event: Event) {
     const input = (event.target as HTMLInputElement).value;
     const sanitizedInput = this.sanitizeFloat(input);
-    const parsedValue = parseFloat(sanitizedInput);
 
-    // allow leading negative sign
-    if (sanitizedInput === '-') {
-      return;
-    }
+    // validate input
+    if (/^-?\d*\.?\d*$/.test(sanitizedInput)) {
+      // allow leading negative sign
+      if (sanitizedInput === '-') {
+        this.value = sanitizedInput;
+        // eslint-disable-next-line no-param-reassign
+        (event.target as HTMLInputElement).value = sanitizedInput;
+        return;
+      }
 
-    if (
-      !Number.isNaN(parsedValue) &&
-      isValidFloat(parsedValue, this.bType === 'FLOAT32' ? 32 : 64)
-    ) {
-      this.value = sanitizedInput;
-      // eslint-disable-next-line no-param-reassign
-      (event.target as HTMLInputElement).value = sanitizedInput;
-    } else {
-      this.value = this.default ?? '0';
-      // eslint-disable-next-line no-param-reassign
-      (event.target as HTMLInputElement).value = this.default ?? '0';
+      const parsedValue = parseFloat(sanitizedInput);
+      if (
+        !Number.isNaN(parsedValue) &&
+        isValidFloat(parsedValue, this.bType === 'FLOAT32' ? 32 : 64)
+      ) {
+        this.value = sanitizedInput;
+        // eslint-disable-next-line no-param-reassign
+        (event.target as HTMLInputElement).value = sanitizedInput;
+      } else {
+        this.value = this.default ?? '0';
+        // eslint-disable-next-line no-param-reassign
+        (event.target as HTMLInputElement).value = this.default ?? '0';
+      }
     }
   }
 
