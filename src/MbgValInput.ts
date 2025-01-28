@@ -84,7 +84,8 @@ export class MbgValInput extends LitElement {
     const sanitizedInput = this.sanitizeInt(input);
 
     // validate input
-    if (/^-?\d*$/.test(sanitizedInput)) {
+    const intRegex = /^-?\d*$/;
+    if (intRegex.test(sanitizedInput)) {
       // allow leading negative sign
       if (sanitizedInput === '-') {
         this.updateValue(event, sanitizedInput);
@@ -181,7 +182,8 @@ export class MbgValInput extends LitElement {
     const sanitizedInput = this.sanitizeFloat(input);
 
     // validate input
-    if (/^-?\d*\.?\d*$/.test(sanitizedInput)) {
+    const floatRegex = /^-?\d*\.?\d*$/;
+    if (floatRegex.test(sanitizedInput)) {
       // allow leading negative sign
       if (sanitizedInput === '-') {
         this.updateValue(event, sanitizedInput);
