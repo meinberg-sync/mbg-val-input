@@ -99,6 +99,8 @@ export class MbgValInput extends LitElement {
         // set default value
         this.updateValue(event, this.default ?? '0');
       }
+    } else {
+      this.updateValue(event, this.default ?? '0');
     }
   }
 
@@ -149,28 +151,42 @@ export class MbgValInput extends LitElement {
     const signed = value[0] === '-' ? '-' : '';
     const negative = signed === '-';
 
+    // account for Euler's number
     if (value === 'e' || value === '-e') {
-      // account for Euler's number
       sanitized = '2.7182818284590452354';
-    } else {
-      // remove leading zeros and invalid characters
-      sanitized = value.replace(/[^0-9.]/g, '').replace(/^0+(?=\d)/, '');
+      return signed + sanitized;
     }
 
-    // track the number of decimal points
+    // remove leading zeros and invalid characters
+    sanitized = value
+      .replace(/[^0-9eE.+-]/g, '')
+      .replace(/(?<![eE])\+|(?<![eE])-/, '');
+
+    // handle multiple exponents
+    const numExponents = sanitized.split(/[eE]/).length - 1;
+    if (numExponents > 1) {
+      sanitized = sanitized.replace(/[eE].*?[eE]/g, 'E');
+    }
+
+    // handle multiple decimal points
     const numDecimalPoints = sanitized.split('.').length - 1;
     if (numDecimalPoints > 1) {
-      // remove extra decimal points
       sanitized = sanitized.replace(/\.(?=.*\.)/g, '');
-      // remove leading zeros
-      sanitized = sanitized.replace(/^0+(?=\d)/, '');
     }
 
-    if (negative) {
+    // remove leading zeros
+    sanitized = sanitized.replace(/^0+(?=\d)/, '');
+    sanitized = sanitized.replace(/^-0+(?=\d)/, '-');
+
+    if (sanitized === '0e' || sanitized === '-0e') {
+      return '0';
+    }
+
+    if (negative && !sanitized.startsWith('-')) {
       sanitized = signed + sanitized;
     }
 
-    if (sanitized === '') {
+    if (sanitized === '' || sanitized === '.') {
       sanitized = this.default ?? '0';
     }
 
@@ -182,7 +198,7 @@ export class MbgValInput extends LitElement {
     const sanitizedInput = this.sanitizeFloat(input);
 
     // validate input
-    const floatRegex = /^-?\d*\.?\d*$/;
+    const floatRegex = /^-?\d*(\.\d*)?([eE][-+]?\d*)?$/;
     if (floatRegex.test(sanitizedInput)) {
       // allow leading negative sign
       if (sanitizedInput === '-') {
@@ -200,6 +216,8 @@ export class MbgValInput extends LitElement {
         // set default value
         this.updateValue(event, this.default ?? '0');
       }
+    } else {
+      this.updateValue(event, this.default ?? '0');
     }
   }
 
