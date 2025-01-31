@@ -35,6 +35,84 @@ function isValidFloat(value: number, size: 32 | 64): boolean {
   return false;
 }
 
+/** Removes invalid characters and validates the float value input */
+function sanitizeAndValidateFloat(
+  value: string,
+  isUserInput: boolean,
+  size: 32 | 64,
+) {
+  let sanitized = '';
+
+  // allow leading negative sign
+  const signed = value[0] === '-' ? '-' : '';
+  const negative = signed === '-';
+
+  // account for Euler's number
+  if (value === 'e' || value === '-e') {
+    sanitized = '2.7182818284590452354';
+    return signed + sanitized;
+  }
+
+  // remove leading zeros and invalid characters
+  sanitized = value
+    .replace(/[^0-9eE.+-]/g, '')
+    .replace(/(?<![eE])\+|(?<![eE])-/, '');
+
+  // handle multiple exponents
+  const numExponents = sanitized.split(/[eE]/).length - 1;
+  if (numExponents > 1) {
+    sanitized = sanitized.replace(/[eE].*?[eE]/g, 'E0');
+  }
+  if (sanitized.endsWith('e') || sanitized.endsWith('E')) {
+    sanitized += '0';
+  }
+
+  // handle multiple decimal points
+  const numDecimalPoints = sanitized.split('.').length - 1;
+  if (numDecimalPoints > 1) {
+    sanitized = sanitized.replace(/\.(?=.*\.)/g, '');
+  }
+
+  // remove leading zeros
+  sanitized = sanitized.replace(/^0+(?=\d)/, '');
+  sanitized = sanitized.replace(/^-0+(?=\d)/, '-');
+
+  // handle special cases
+  if (sanitized === '0e' || sanitized === '-0e') {
+    return '0';
+  }
+  if (negative && !sanitized.startsWith('-')) {
+    sanitized = signed + sanitized;
+  }
+  if (sanitized === '.') {
+    sanitized = '0.';
+  }
+
+  // ensure input was properly sanitized
+  const floatRegex = /^-?\d*(\.\d*)?([eE][-+]?\d*)?$/;
+  if (!floatRegex.test(sanitized)) {
+    return '';
+  }
+
+  // allow leading negative sign only if it is from user input
+  if (sanitized === '-') {
+    if (isUserInput) {
+      return sanitized;
+    }
+    return '';
+  }
+
+  // parse into float and validate
+  if (sanitized !== '') {
+    const parsedValue = parseFloat(sanitized);
+    if (Number.isNaN(parsedValue) || !isValidFloat(parsedValue, size)) {
+      return '';
+    }
+  }
+
+  return sanitized;
+}
+
 function sanitizeOctet(value: string) {
   return value.replace(/[^0-9a-fA-F]/g, '');
 }
@@ -150,90 +228,39 @@ export class MbgValInput extends LitElement {
     ></md-outlined-text-field>`;
   }
 
-  private sanitizeFloat(value: string) {
-    let sanitized = '';
-
-    // allow leading negative sign
-    const signed = value[0] === '-' ? '-' : '';
-    const negative = signed === '-';
-
-    // account for Euler's number
-    if (value === 'e' || value === '-e') {
-      sanitized = '2.7182818284590452354';
-      return signed + sanitized;
-    }
-
-    // remove leading zeros and invalid characters
-    sanitized = value
-      .replace(/[^0-9eE.+-]/g, '')
-      .replace(/(?<![eE])\+|(?<![eE])-/, '');
-
-    // handle multiple exponents
-    const numExponents = sanitized.split(/[eE]/).length - 1;
-    if (numExponents > 1) {
-      sanitized = sanitized.replace(/[eE].*?[eE]/g, 'E');
-    }
-
-    // handle multiple decimal points
-    const numDecimalPoints = sanitized.split('.').length - 1;
-    if (numDecimalPoints > 1) {
-      sanitized = sanitized.replace(/\.(?=.*\.)/g, '');
-    }
-
-    // remove leading zeros
-    sanitized = sanitized.replace(/^0+(?=\d)/, '');
-    sanitized = sanitized.replace(/^-0+(?=\d)/, '-');
-
-    if (sanitized === '0e' || sanitized === '-0e') {
-      return '0';
-    }
-
-    if (negative && !sanitized.startsWith('-')) {
-      sanitized = signed + sanitized;
-    }
-
-    if (sanitized === '' || sanitized === '.') {
-      sanitized = this.default ?? '0';
-    }
-
-    return sanitized;
-  }
-
   private handleFloatInput(event: Event) {
     const input = (event.target as HTMLInputElement).value;
-    const sanitizedInput = this.sanitizeFloat(input);
+    const validatedInput = sanitizeAndValidateFloat(
+      input,
+      true,
+      this.bType === 'FLOAT32' ? 32 : 64,
+    );
+    const validatedDefault = sanitizeAndValidateFloat(
+      this.default,
+      false,
+      this.bType === 'FLOAT32' ? 32 : 64,
+    );
 
-    // validate input
-    const floatRegex = /^-?\d*(\.\d*)?([eE][-+]?\d*)?$/;
-    if (floatRegex.test(sanitizedInput)) {
-      // allow leading negative sign
-      if (sanitizedInput === '-') {
-        this.updateValue(event, sanitizedInput);
-        return;
-      }
-
-      const parsedValue = parseFloat(sanitizedInput);
-      if (
-        !Number.isNaN(parsedValue) &&
-        isValidFloat(parsedValue, this.bType === 'FLOAT32' ? 32 : 64)
-      ) {
-        this.updateValue(event, sanitizedInput);
-      } else {
-        // set default value
-        this.updateValue(event, this.default ?? '0');
-      }
-    } else {
-      this.updateValue(event, this.default ?? '0');
+    if (validatedInput === '') {
+      this.updateValue(event, validatedDefault ?? '0');
+      return;
     }
+
+    this.updateValue(event, validatedInput);
   }
 
   floatInput() {
+    const validatedDefault = sanitizeAndValidateFloat(
+      this.default,
+      false,
+      this.bType === 'FLOAT32' ? 32 : 64,
+    );
     return html`
       <md-outlined-text-field
         id="$input"
         label="${this.label}"
         type="text"
-        value="${this.default ?? nothing}"
+        value="${validatedDefault ?? nothing}"
         @input="${this.handleFloatInput}"
       ></md-outlined-text-field>
     `;
