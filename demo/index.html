@@ -6,25 +6,123 @@
   <style>
     body {
       background: #fafafa;
+      font-family: sans-serif;
+    }
+
+    h1 {
+      margin: 1rem;
+    }
+
+    #container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    #demo {
+      background-color: whitesmoke;
+      padding: 0 1rem 1rem 1rem;
+      width: 50%;
+    }
+
+    #selector {
+      background-color: gainsboro;
+      padding: 0 1rem 1rem 1rem;
+      width: 50%;
+    }
+
+    #submit {
+      margin-top: 2rem;
+      padding: 0.5rem 2rem;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div id="demo"></div>
+  <h1>mbg-val-input Demo</h1>
+  <div id="container">
+    <div id="demo"></div>
+    <div id="selector">
+      <form id="bType">
+        <h2>Select a bType to demo</h2>
+        <label for="bTypeSelect">bType:</label>
+        <select id="bTypeSelect">
+          <option value="">---</option>
+          <option value="BOOLEAN" desc="Boolean">Boolean</option>
+          <option value="INT8" desc="Integer size 8">Integer size 8</option>
+          <option value="INT16">Integer size 16</option>
+          <option value="INT24">Integer size 24</option>
+          <option value="INT32">Integer size 32</option>
+          <option value="INT64">Integer size 64</option>
+          <option value="INT128">Integer size 128</option>
+          <option value="INT8U">Unsigned Integer size 8</option>
+          <option value="INT16U">Unsigned Integer size 16</option>
+          <option value="INT24U">Unsigned Integer size 24</option>
+          <option value="INT32U">Unsigned Integer size 32</option>
+          <option value="FLOAT32">Float size 32</option>
+          <option value="FLOAT64">Float size 64</option>
+          <option value="Octet6">Octet String size 6</option>
+          <option value="Octet16">Octet String size 16</option>
+          <option value="Octet64">Octet String size 64</option>
+          <option value="VisString32">Visible String size 32</option>
+          <option value="VisString64">Visible String size 64</option>
+          <option value="VisString65">Visible String size 65</option>
+          <option value="VisString129">Visible String size 129</option>
+          <option value="VisString255">Visible String size 255</option>
+          <option value="Unicode255">Unicode String size 255</option>
+          <option value="Quality">Quality</option>
+        </select>
+      </form>
 
+      <form id="label">
+        <h2>Set a Label</h2>
+        <label for="labelInput">Label:</label>
+        <input type="text" id="labelInput">
+      </form>
+
+      <form id="default">
+        <h2>Set a Default Value</h2>
+        <label for="defaultInput">Default Value:</label>
+        <input type="text" id="defaultInput">
+      </form>
+
+      <button id="submit" type="submit">Submit</button>
+    </div>
+  </div>
   <script type="module">
     import { html, render } from 'lit';
     import '../dist/src/mbg-val-input.js';
 
-    const header = 'Hello owc World!';
-    render(
-      html`
-        <mbg-val-input .header=${header}>
-          some light-dom
-        </mbg-val-input>
-      `,
-      document.querySelector('#demo')
-    );
+    document.querySelector('#submit').addEventListener('click', (e) => {
+      e.preventDefault();
+      const bType = document.querySelector('#bTypeSelect').value;
+      const label = document.querySelector('#labelInput').value;
+      const defaultVal = document.querySelector('#defaultInput').value;
+      render(
+        html`
+          <div>
+            <h2>Please enter a value: ${bType}</h2>
+            <mbg-val-input bType="${bType}" label="${label}" default="${defaultVal}">
+            </mbg-val-input>
+          </div>
+        `,
+        document.querySelector('#demo')
+      );
+    });
+
+    document.querySelector('#selector').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.querySelector('#submit').click();
+      }
+    });
+
+    document.querySelector('#bTypeSelect').addEventListener('change', (e) => {
+      e.preventDefault();
+      document.querySelector('#labelInput').value = '';
+      document.querySelector('#defaultInput').value = '';
+      document.querySelector('#submit').click();
+    });
+
   </script>
 </body>
 </html>
