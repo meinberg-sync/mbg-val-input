@@ -243,18 +243,17 @@ export class MbgValInput extends LitElement {
     const input = (event.target as HTMLInputElement).value;
     let sanitizedInput = sanitizeOctet(input);
     if (sanitizedInput === '') {
-      sanitizedInput = this.default ?? '';
+      sanitizedInput = sanitizeOctet(this.default) ?? '';
     }
     this.updateValue(event, sanitizedInput);
   }
 
   octetInput(size: 6 | 16 | 64) {
-    this.default = sanitizeOctet(this.default);
     return html`
       <md-outlined-text-field
         id="input"
         label="${this.label}"
-        value="${this.default ?? nothing}"
+        value="${sanitizeOctet(this.default) ?? nothing}"
         maxlength="${size * 2}"
         @input="${this.handleOctetInput}"
       ></md-outlined-text-field>
