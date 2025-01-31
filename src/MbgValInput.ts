@@ -266,6 +266,14 @@ export class MbgValInput extends LitElement {
     `;
   }
 
+  private handleStringInput(event: Event) {
+    let input = (event.target as HTMLInputElement).value;
+    if (input === '') {
+      input = this.default ?? '';
+    }
+    this.updateValue(event, input);
+  }
+
   stringInput(size: 32 | 64 | 65 | 129 | 255) {
     return html`
       <md-outlined-text-field
@@ -273,6 +281,7 @@ export class MbgValInput extends LitElement {
         label="${this.label}"
         value="${this.default ?? nothing}"
         maxlength="${size}"
+        @input="${this.handleStringInput}"
       ></md-outlined-text-field>
     `;
   }
