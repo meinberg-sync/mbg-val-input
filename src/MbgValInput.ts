@@ -35,6 +35,10 @@ function isValidFloat(value: number, size: 32 | 64): boolean {
   return false;
 }
 
+function sanitizeOctet(value: string) {
+  return value.replace(/[^0-9a-fA-F]/g, '');
+}
+
 /** Web Component for inputting IEC61850-6 "Val" values */
 export class MbgValInput extends LitElement {
   static styles = css``;
@@ -235,26 +239,17 @@ export class MbgValInput extends LitElement {
     `;
   }
 
-  private sanitizeOctet(value: string) {
-    let sanitized = '';
-
-    // only allow hex digits
-    sanitized = value.replace(/[^0-9a-fA-F]/g, '');
-
-    if (sanitized === '') {
-      sanitized = this.default ?? '';
-    }
-
-    return sanitized;
-  }
-
   private handleOctetInput(event: Event) {
     const input = (event.target as HTMLInputElement).value;
-    const sanitizedInput = this.sanitizeOctet(input);
+    let sanitizedInput = sanitizeOctet(input);
+    if (sanitizedInput === '') {
+      sanitizedInput = this.default ?? '';
+    }
     this.updateValue(event, sanitizedInput);
   }
 
   octetInput(size: 6 | 16 | 64) {
+    this.default = sanitizeOctet(this.default);
     return html`
       <md-outlined-text-field
         id="input"
