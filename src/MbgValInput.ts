@@ -12,6 +12,12 @@ function xmlBoolean(val?: string) {
   return ['true', '1'].includes(val?.toLowerCase().trim() ?? 'false');
 }
 
+function isValidInt(value: number, size: number, signed: boolean): boolean {
+  const min = signed ? -(2 ** (size - 1)) : 0;
+  const max = signed ? 2 ** (size - 1) - 1 : 2 ** size - 1;
+  return value >= min && value <= max;
+}
+
 function isValidBigInt(value: bigint, size: 64 | 128): boolean {
   if (size === 64) {
     return value >= -9223372036854775808n && value <= 9223372036854775807n;
@@ -27,8 +33,9 @@ function isValidBigInt(value: bigint, size: 64 | 128): boolean {
 
 function sanitizeAndValidateInt(
   value: string,
+  size: number,
   isUserInput: boolean,
-  size: 64 | 128,
+  isSigned = true,
 ) {
   // allow leading negative sign
   const signed = value[0] === '-' ? '-' : '';
@@ -59,11 +66,21 @@ function sanitizeAndValidateInt(
     return '';
   }
 
-  // parse into a bigint and validate
+  // parse and validate
   if (sanitized !== '') {
-    const parsedValue = BigInt(sanitized);
-    if (Number.isNaN(parsedValue) || !isValidBigInt(parsedValue, size)) {
-      return '';
+    if (size === 64 || size === 128) {
+      const parsedValue = BigInt(sanitized);
+      if (Number.isNaN(parsedValue) || !isValidBigInt(parsedValue, size)) {
+        return '';
+      }
+    } else {
+      const parsedValue = Number(sanitized);
+      if (
+        Number.isNaN(parsedValue) ||
+        !isValidInt(parsedValue, size, isSigned)
+      ) {
+        return '';
+      }
     }
   }
 
@@ -184,17 +201,22 @@ export class MbgValInput extends LitElement {
     (event.target as HTMLInputElement).value = userValue;
   }
 
+  private parseBTypeSize() {
+    const match = this.bType?.match(/INT(\d+)/);
+    return match ? parseInt(match[1], 10) : 0;
+  }
+
   private handleBigIntInput(event: Event) {
     const input = (event.target as HTMLInputElement).value;
     const validatedInput = sanitizeAndValidateInt(
       input,
+      this.parseBTypeSize(),
       true,
-      this.bType === 'INT128' ? 128 : 64,
     );
     const validatedDefault = sanitizeAndValidateInt(
       this.default,
+      this.parseBTypeSize(),
       false,
-      this.bType === 'INT128' ? 128 : 64,
     );
 
     if (validatedInput === '') {
@@ -207,29 +229,32 @@ export class MbgValInput extends LitElement {
 
   private handleIntInput(event: Event) {
     const input = (event.target as HTMLInputElement).value;
+    const signed = !this.bType?.endsWith('U');
+    const validatedDefault = sanitizeAndValidateInt(
+      this.default,
+      this.parseBTypeSize(),
+      false,
+      signed,
+    );
 
-    // allow leading negative sign
-    if (input === '-') {
-      return;
+    // set default if input is empty
+    if (input === '') {
+      this.updateValue(event, validatedDefault ?? 0);
     }
-
-    const int = Math.round(parseInt(input, 10));
-    this.value = int.toString();
-    // eslint-disable-next-line no-param-reassign
-    (event.target as HTMLInputElement).value = int.toString();
   }
 
   intInput(size: 8 | 16 | 24 | 32 | 64 | 128, signed = true) {
     const min = signed ? -(2 ** (size - 1)) : 0;
     const max = signed ? 2 ** (size - 1) - 1 : 2 ** size - 1;
 
-    if (size > 52) {
-      const validatedDefault = sanitizeAndValidateInt(
-        this.default,
-        false,
-        this.bType === 'INT128' ? 128 : 64,
-      );
+    const validatedDefault = sanitizeAndValidateInt(
+      this.default,
+      this.parseBTypeSize(),
+      false,
+      signed,
+    );
 
+    if (size > 52) {
       return html`<md-outlined-text-field
         id="input"
         label="${this.label}"
@@ -246,7 +271,7 @@ export class MbgValInput extends LitElement {
       step="1"
       min="${min}"
       max="${max}"
-      value="${this.default ?? nothing}"
+      value="${validatedDefault ?? nothing}"
       @input="${this.handleIntInput}"
     ></md-outlined-text-field>`;
   }
