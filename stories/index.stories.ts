@@ -139,3 +139,10 @@ QualityWithDefault.args = {
   defaultVal: 'QUALITY_VALIDITY_RESERVED',
   label: 'Quality',
 };
+
+export const Currency = Template.bind({});
+Currency.args = {
+  bType: 'Currency',
+  defaultVal: 'USD',
+  label: 'Currency',
+};

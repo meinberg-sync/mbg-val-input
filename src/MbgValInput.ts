@@ -2,6 +2,7 @@
 import { html, css, LitElement, TemplateResult, nothing } from 'lit';
 import { property, query } from 'lit/decorators.js';
 import type { MdSwitch } from '@material/web/switch/switch.js';
+import { currencyInput } from './currency-input.js';
 
 import '@material/web/textfield/outlined-text-field.js';
 import '@material/web/select/filled-select.js';
@@ -415,6 +416,7 @@ export class MbgValInput extends LitElement {
       VisString255: this.stringInput(255),
       Unicode255: this.stringInput(255),
       Quality: this.qualityInput(),
+      Currency: currencyInput(this.label, this.default),
     };
   }
 
