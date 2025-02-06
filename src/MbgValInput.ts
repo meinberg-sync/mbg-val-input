@@ -189,8 +189,11 @@ export class MbgValInput extends LitElement {
   // If the DA/BDA is assigned a Val in DataTypeTemplates
   @property({ type: String }) default = '';
 
-  // if bType === "Enum"
-  @property({ type: Array }) enumVals: string[] = [];
+  // if bType === "Enum" - ordinal values
+  @property({ type: Array }) enumOrdinals: string[] = [];
+
+  // if bType === "Enum" - string labels
+  @property({ type: Array }) enumLabels: string[] = [];
 
   @property({ type: String }) label = 'Val';
 
@@ -377,6 +380,33 @@ export class MbgValInput extends LitElement {
     `;
   }
 
+  enumInput() {
+    let ordinals: string[] = [];
+    let labels: string[] = [];
+
+    if (typeof this.enumOrdinals === 'string') {
+      ordinals = JSON.parse(this.enumOrdinals) as string[];
+    }
+    if (typeof this.enumLabels === 'string') {
+      labels = JSON.parse(this.enumLabels) as string[];
+    }
+
+    return html`
+      <md-filled-select id="input" label="${this.label}">
+        ${ordinals.map(
+          (ordinal, index) => html`
+            <md-select-option
+              value="${ordinal}"
+              ?selected=${this.default === ordinal}
+            >
+              <div slot="headline">${ordinal} - ${labels[index]}</div>
+            </md-select-option>
+          `,
+        )}
+      </md-filled-select>
+    `;
+  }
+
   get value() {
     if (this.bType === 'BOOLEAN') {
       return (this.input as unknown as MdSwitch).selected ? 'true' : 'false';
@@ -417,6 +447,7 @@ export class MbgValInput extends LitElement {
       Unicode255: this.stringInput(255),
       Quality: this.qualityInput(),
       Currency: currencyInput(this.label, this.default),
+      Enum: this.enumInput(),
     };
   }
 

@@ -71,6 +71,8 @@
           <option value="Unicode255">Unicode String size 255</option>
           <option value="Quality">Quality</option>
           <option value="Currency">Currency</option>
+          <option value="Enum1">Enum - HealthKind</option>
+          <option value="Enum2">Enum - MaterialKind</option>
         </select>
       </form>
 
@@ -98,6 +100,49 @@
       const bType = document.querySelector('#bTypeSelect').value;
       const label = document.querySelector('#labelInput').value;
       const defaultVal = document.querySelector('#defaultInput').value;
+
+      if (bType === "Enum1") {
+        const enumOrdinals = ['1', '2', '3'];
+        const enumLabels = ['Ok', 'Warning', 'Alarm'];
+        render(
+          html`
+            <div>
+              <h2>Please enter a value: Enum - HealthKind</h2>
+              <mbg-val-input 
+                bType="Enum"
+                label="${label}"
+                default="${defaultVal}"
+                .enumOrdinals="${JSON.stringify(enumOrdinals)}"
+                .enumLabels="${JSON.stringify(enumLabels)}">
+              </mbg-val-input>
+            </div>
+          `,
+          document.querySelector('#demo')
+        )
+        return;
+      } 
+      
+      if (bType === "Enum2") {
+        const enumOrdinals = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '98', '99'];
+        const enumLabels = ['Air', 'Water', 'Steam', 'Oil', 'Hydrogen', 'Natural gas', 'Butane', 'Propane', 'Waste gas', 'Not applicable/Unknown', 'Other'];
+        render(
+          html`
+            <div>
+              <h2>Please enter a value: Enum - MaterialKind</h2>
+              <mbg-val-input 
+                bType="Enum"
+                label="${label}"
+                default="${defaultVal}"
+                .enumOrdinals="${JSON.stringify(enumOrdinals)}"
+                .enumLabels="${JSON.stringify(enumLabels)}">
+              </mbg-val-input>
+            </div>
+          `,
+          document.querySelector('#demo')
+        )
+        return;
+      }
+
       render(
         html`
           <div>

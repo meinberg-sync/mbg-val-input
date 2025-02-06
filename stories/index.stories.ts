@@ -7,7 +7,8 @@ export default {
   argTypes: {
     bType: { control: 'text' },
     defaultVal: { control: 'text' },
-    enumVals: { control: 'array' },
+    enumOrdinals: { control: 'array' },
+    enumLabels: { control: 'array' },
     label: { control: 'text' },
     value: { control: 'text' },
   },
@@ -22,7 +23,8 @@ interface Story<T> {
 interface ArgTypes {
   bType?: string;
   defaultVal?: string;
-  enumVals?: string[];
+  enumOrdinals?: string[];
+  enumLabels?: string[];
   label?: string;
   value?: string;
 }
@@ -30,14 +32,16 @@ interface ArgTypes {
 const Template: Story<ArgTypes> = ({
   bType,
   defaultVal,
-  enumVals,
+  enumOrdinals,
+  enumLabels,
   label,
   value,
 }: ArgTypes) => html`
   <mbg-val-input
     .bType=${bType}
     .default=${defaultVal}
-    .enumVals=${enumVals}
+    .enumOrdinals=${JSON.stringify(enumOrdinals)}
+    .enumLabels=${JSON.stringify(enumLabels)}
     .label=${label}
     .value=${value}
   >
@@ -145,4 +149,13 @@ Currency.args = {
   bType: 'Currency',
   defaultVal: 'USD',
   label: 'Currency',
+};
+
+export const EnumHlth = Template.bind({});
+EnumHlth.args = {
+  bType: 'Enum',
+  enumOrdinals: ['1', '2', '3'],
+  enumLabels: ['Ok', 'Warning', 'Alarm'],
+  label: 'Enum - HealthKind',
+  defaultVal: '1',
 };
