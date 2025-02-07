@@ -180,9 +180,38 @@ function sanitizeOctet(value: string) {
   return value.replace(/[^0-9a-fA-F]/g, '');
 }
 
+function formatTimestamp(input: string) {
+  const digits = input.replace(/\D/g, '');
+
+  // Extract parts
+  const year = digits.slice(0, 4);
+  const month = digits.slice(4, 6);
+  const day = digits.slice(6, 8);
+  const hour = digits.slice(8, 10);
+  const minute = digits.slice(10, 12);
+  const second = digits.slice(12, 14);
+  const millisecond = digits.slice(14, 17); // Optional milliseconds
+
+  let formatted = `${year}`;
+  if (month) formatted += `-${month}`;
+  if (day) formatted += `-${day}`;
+  if (hour) formatted += `T${hour}`;
+  if (minute) formatted += `:${minute}`;
+  if (second) formatted += `:${second}`;
+  if (millisecond) formatted += `.${millisecond}`;
+
+  return formatted;
+}
+
 /** Web Component for inputting IEC61850-6 "Val" values */
 export class MbgValInput extends LitElement {
-  static styles = css``;
+  static styles = css`
+    md-outlined-text-field.Timestamp {
+      min-width: 250px;
+      max-width: 100%;
+      width: auto;
+    }
+  `;
 
   @property({ type: String }) bType?: string;
 
@@ -407,6 +436,33 @@ export class MbgValInput extends LitElement {
     `;
   }
 
+  private handleTimestampInput(event: Event) {
+    const input = (event.target as HTMLInputElement).value;
+    const validatedInput = formatTimestamp(input);
+
+    if (validatedInput === '') {
+      const validatedDefault = formatTimestamp(this.default);
+      this.updateValue(event, validatedDefault ?? '');
+      return;
+    }
+
+    this.updateValue(event, validatedInput);
+  }
+
+  timestampInput() {
+    const validatedDefault = formatTimestamp(this.default);
+    return html`
+      <md-outlined-text-field
+        class="Timestamp"
+        id="input"
+        placeholder="YYYY-MM-DDTHH:MM:SS.sss"
+        label="${this.label}"
+        value="${validatedDefault ?? nothing}"
+        @input="${this.handleTimestampInput}"
+      ></md-outlined-text-field>
+    `;
+  }
+
   get value() {
     if (this.bType === 'BOOLEAN') {
       return (this.input as unknown as MdSwitch).selected ? 'true' : 'false';
@@ -448,6 +504,7 @@ export class MbgValInput extends LitElement {
       Quality: this.qualityInput(),
       Currency: currencyInput(this.label, this.default),
       Enum: this.enumInput(),
+      Timestamp: this.timestampInput(),
     };
   }
 

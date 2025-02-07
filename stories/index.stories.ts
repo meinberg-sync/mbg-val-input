@@ -159,3 +159,9 @@ EnumHlth.args = {
   label: 'Enum - HealthKind',
   defaultVal: '1',
 };
+
+export const Timestamp = Template.bind({});
+Timestamp.args = {
+  bType: 'Timestamp',
+  label: 'Timestamp',
+};
