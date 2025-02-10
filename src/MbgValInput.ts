@@ -398,27 +398,6 @@ export class MbgValInput extends LitElement {
     `;
   }
 
-  qualityInput() {
-    return html`
-      <md-filled-select id="input" label="${this.label}">
-        <md-select-option value="QUALITY_VALIDITY_GOOD" ?selected=${this.default === 'QUALITY_VALIDITY_GOOD'}>
-          <div slot="headline">QUALITY_VALIDITY_GOOD</div>
-        </md-select-option>
-        <md-select-option value="QUALITY_VALIDITY_INVALID" ?selected=${this.default === 'QUALITY_VALIDITY_INVALID'}>
-          <div slot="headline">QUALITY_VALIDITY_INVALID</div>
-        </md-select-option>
-        </md-select-option>
-        <md-select-option value="QUALITY_VALIDITY_RESERVED" ?selected=${this.default === 'QUALITY_VALIDITY_RESERVED'}>
-          <div slot="headline">QUALITY_VALIDITY_RESERVED</div>
-        </md-select-option>
-        </md-select-option>
-        <md-select-option value="QUALITY_VALIDITY_QUESTIONABLE" ?selected=${this.default === 'QUALITY_VALIDITY_QUESTIONABLE'}>
-          <div slot="headline">QUALITY_VALIDITY_QUESTIONABLE</div>
-        </md-select-option>
-      </md-filled-select>
-    `;
-  }
-
   enumInput() {
     let ordinals: string[] = [];
     let labels: string[] = [];
@@ -545,7 +524,7 @@ export class MbgValInput extends LitElement {
     this.updateValue(event, sanitizedInput);
   }
 
-  bitstringInput(size: 5 | 6 | 10) {
+  bitstringInput(size: 5 | 6 | 10 | 14) {
     return html`
       <md-outlined-text-field
         id="input"
@@ -595,7 +574,7 @@ export class MbgValInput extends LitElement {
       VisString129: this.stringInput(129),
       VisString255: this.stringInput(255),
       Unicode255: this.stringInput(255),
-      Quality: this.qualityInput(),
+      Quality: this.bitstringInput(14),
       Currency: currencyInput(this.label, this.default),
       Enum: this.enumInput(),
       Timestamp: this.timestampInput(),

@@ -131,16 +131,10 @@ VisString255.args = {
   label: 'VisString255',
 };
 
-export const Quality = Template.bind({});
-Quality.args = {
-  bType: 'Quality',
-  label: 'Quality',
-};
-
 export const QualityWithDefault = Template.bind({});
 QualityWithDefault.args = {
   bType: 'Quality',
-  defaultVal: 'QUALITY_VALIDITY_RESERVED',
+  defaultVal: '00000000000000',
   label: 'Quality',
 };
 
