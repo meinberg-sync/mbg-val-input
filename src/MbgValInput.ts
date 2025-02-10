@@ -180,6 +180,14 @@ function sanitizeOctet(value: string) {
   return value.replace(/[^0-9a-fA-F]/g, '');
 }
 
+function sanitizeObjRef(value: string) {
+  return value.replace(/[^A-Za-z0-9_/$]/g, '');
+}
+
+function sanitizeBitString(value: string) {
+  return value.replace(/[^01]/g, '');
+}
+
 function formatTimestamp(input: string) {
   const digits = input.replace(/\D/g, '');
 
@@ -262,10 +270,12 @@ export class MbgValInput extends LitElement {
 
   private handleIntInput(event: Event) {
     const input = (event.target as HTMLInputElement).value;
-    const signed = !this.bType?.endsWith('U');
+    const signed = !(this.bType?.endsWith('U') || this.bType === 'Check');
+    const size = this.bType === 'Check' ? 8 : this.parseBTypeSize();
+
     const validatedDefault = sanitizeAndValidateInt(
       this.default,
-      this.parseBTypeSize(),
+      size,
       false,
       signed,
     );
@@ -282,7 +292,7 @@ export class MbgValInput extends LitElement {
 
     const validatedDefault = sanitizeAndValidateInt(
       this.default,
-      this.parseBTypeSize(),
+      size,
       false,
       signed,
     );
@@ -356,7 +366,7 @@ export class MbgValInput extends LitElement {
     this.updateValue(event, sanitizedInput);
   }
 
-  octetInput(size: 6 | 16 | 64) {
+  octetInput(size: 6 | 8 | 16 | 64) {
     return html`
       <md-outlined-text-field
         id="input"
@@ -463,6 +473,90 @@ export class MbgValInput extends LitElement {
     `;
   }
 
+  private handleObjRefInput(event: Event) {
+    const input = (event.target as HTMLInputElement).value;
+    let sanitizedInput = sanitizeObjRef(input);
+    if (sanitizedInput === '') {
+      sanitizedInput = sanitizeObjRef(this.default) ?? '';
+    }
+    this.updateValue(event, sanitizedInput);
+  }
+
+  objrefInput() {
+    return html`
+      <md-outlined-text-field
+        id="input"
+        label="${this.label}"
+        value="${sanitizeObjRef(this.default) ?? nothing}"
+        maxlength="255"
+        @input="${this.handleObjRefInput}"
+      ></md-outlined-text-field>
+    `;
+  }
+
+  dbposInput() {
+    return html`
+      <md-filled-select id="input" label="${this.label}">
+        <md-select-option value="0" ?selected=${this.default === '0'}>
+          <div slot="headline">0 - intermediate-state</div>
+        </md-select-option>
+        <md-select-option value="1" ?selected=${this.default === '1'}>
+          <div slot="headline">1 - off</div>
+        </md-select-option>
+        </md-select-option>
+        <md-select-option value="2" ?selected=${this.default === '2'}>
+          <div slot="headline">2 - on</div>
+        </md-select-option>
+        </md-select-option>
+        <md-select-option value="3" ?selected=${this.default === '3'}>
+          <div slot="headline">3 - bad-state</div>
+        </md-select-option>
+      </md-filled-select>
+    `;
+  }
+
+  tcmdInput() {
+    return html`
+      <md-filled-select id="input" label="${this.label}">
+        <md-select-option value="0" ?selected=${this.default === '0'}>
+          <div slot="headline">0 - neutral</div>
+        </md-select-option>
+        <md-select-option value="1" ?selected=${this.default === '1'}>
+          <div slot="headline">1 - lower</div>
+        </md-select-option>
+        </md-select-option>
+        <md-select-option value="2" ?selected=${this.default === '2'}>
+          <div slot="headline">2 - higher</div>
+        </md-select-option>
+        </md-select-option>
+        <md-select-option value="3" ?selected=${this.default === '3'}>
+          <div slot="headline">3 - reserved</div>
+        </md-select-option>
+      </md-filled-select>
+    `;
+  }
+
+  private handleBitStringInput(event: Event) {
+    const input = (event.target as HTMLInputElement).value;
+    let sanitizedInput = sanitizeBitString(input);
+    if (sanitizedInput === '') {
+      sanitizedInput = sanitizeBitString(this.default) ?? '';
+    }
+    this.updateValue(event, sanitizedInput);
+  }
+
+  bitstringInput(size: 5 | 6 | 10) {
+    return html`
+      <md-outlined-text-field
+        id="input"
+        label="${this.label}"
+        value="${sanitizeBitString(this.default) ?? nothing}"
+        maxlength="${size}"
+        @input="${this.handleBitStringInput}"
+      ></md-outlined-text-field>
+    `;
+  }
+
   get value() {
     if (this.bType === 'BOOLEAN') {
       return (this.input as unknown as MdSwitch).selected ? 'true' : 'false';
@@ -505,6 +599,16 @@ export class MbgValInput extends LitElement {
       Currency: currencyInput(this.label, this.default),
       Enum: this.enumInput(),
       Timestamp: this.timestampInput(),
+      ObjRef: this.objrefInput(),
+      Dbpos: this.dbposInput(),
+      Tcmd: this.tcmdInput(),
+      EntryTime: this.octetInput(6),
+      Check: this.intInput(8, false),
+      TrgOps: this.bitstringInput(6),
+      OptFlds: this.bitstringInput(10),
+      SvOptFlds: this.bitstringInput(6),
+      LogOptFlds: this.bitstringInput(5),
+      EntryID: this.octetInput(8),
     };
   }
 

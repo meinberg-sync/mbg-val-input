@@ -164,4 +164,72 @@ export const Timestamp = Template.bind({});
 Timestamp.args = {
   bType: 'Timestamp',
   label: 'Timestamp',
+  defaultVal: '2022-01-01T00:00:00.000',
+};
+
+export const ObjRef = Template.bind({});
+ObjRef.args = {
+  bType: 'ObjRef',
+  label: 'Object Reference',
+  defaultVal: 'IED1/LPHD1$PhyHealth',
+};
+
+export const Dbpos = Template.bind({});
+Dbpos.args = {
+  bType: 'Dbpos',
+  label: 'Double-Point Status',
+  defaultVal: '2',
+};
+
+export const Tcmd = Template.bind({});
+Tcmd.args = {
+  bType: 'Tcmd',
+  label: 'Tap Command',
+  defaultVal: '2',
+};
+
+export const EntryTime = Template.bind({});
+EntryTime.args = {
+  bType: 'EntryTime',
+  label: 'Entry Time',
+};
+
+export const Check = Template.bind({});
+Check.args = {
+  bType: 'Check',
+  label: 'Check',
+};
+
+export const TrgOps = Template.bind({});
+TrgOps.args = {
+  bType: 'TrgOps',
+  label: 'Trigger Options',
+  defaultVal: '101000',
+};
+
+export const OptFlds = Template.bind({});
+OptFlds.args = {
+  bType: 'OptFlds',
+  label: 'Optional Fields',
+  defaultVal: '0000000011',
+};
+
+export const SvOptFlds = Template.bind({});
+SvOptFlds.args = {
+  bType: 'SvOptFlds',
+  label: 'Sampled Values Optional Fields',
+  defaultVal: '000101',
+};
+
+export const LogOptFlds = Template.bind({});
+LogOptFlds.args = {
+  bType: 'LogOptFlds',
+  label: 'Log Optional Fields',
+  defaultVal: '01101',
+};
+
+export const EntryID = Template.bind({});
+EntryID.args = {
+  bType: 'EntryID',
+  label: 'Entry ID',
 };
