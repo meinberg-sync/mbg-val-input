@@ -414,8 +414,9 @@ export class MbgValInput extends LitElement {
         ${ordinals.map(
           (ordinal, index) => html`
             <md-select-option
-              value="${ordinal}"
-              ?selected=${this.default === ordinal}
+              value="${labels[index]}"
+              ?selected=${this.default === labels[index] ||
+              this.default === ordinal}
             >
               <div slot="headline">${ordinal} - ${labels[index]}</div>
             </md-select-option>
