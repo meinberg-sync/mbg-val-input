@@ -6,6 +6,7 @@ export default {
   component: 'mbg-val-input',
   argTypes: {
     bType: { control: 'text' },
+    readOnly: { control: 'boolean' },
     defaultVal: { control: 'text' },
     enumOrdinals: { control: 'array' },
     enumLabels: { control: 'array' },
@@ -22,6 +23,7 @@ interface Story<T> {
 
 interface ArgTypes {
   bType?: string;
+  readOnly?: boolean;
   defaultVal?: string;
   enumOrdinals?: string[];
   enumLabels?: string[];
@@ -31,6 +33,7 @@ interface ArgTypes {
 
 const Template: Story<ArgTypes> = ({
   bType,
+  readOnly,
   defaultVal,
   enumOrdinals,
   enumLabels,
@@ -39,6 +42,7 @@ const Template: Story<ArgTypes> = ({
 }: ArgTypes) => html`
   <mbg-val-input
     .bType=${bType}
+    .readOnly=${readOnly}
     .default=${defaultVal}
     .enumOrdinals=${JSON.stringify(enumOrdinals)}
     .enumLabels=${JSON.stringify(enumLabels)}
@@ -66,6 +70,14 @@ BooleanWithDefault.args = {
   label: 'Boolean (Default: true)',
 };
 
+export const BooleanReadOnly = Template.bind({});
+BooleanReadOnly.args = {
+  bType: 'BOOLEAN',
+  defaultVal: 'true',
+  readOnly: true,
+  label: 'Boolean (Default: true)',
+};
+
 export const Int32U = Template.bind({});
 Int32U.args = {
   bType: 'INT32U',
@@ -82,6 +94,7 @@ export const Int64WithDefault = Template.bind({});
 Int64WithDefault.args = {
   bType: 'INT64',
   defaultVal: '-42',
+  readOnly: true,
   label: 'INT64 (Default: -42)',
 };
 
@@ -116,6 +129,7 @@ Octet16.args = {
   bType: 'Octet16',
   defaultVal: '0123456789ABCDEF0123456789ABCDEF',
   label: 'Octet16',
+  readOnly: true,
 };
 
 export const VisString32 = Template.bind({});
@@ -145,6 +159,14 @@ Currency.args = {
   label: 'Currency',
 };
 
+export const CurrencyReadOnly = Template.bind({});
+CurrencyReadOnly.args = {
+  bType: 'Currency',
+  defaultVal: 'JPY',
+  readOnly: true,
+  label: 'Currency',
+};
+
 export const EnumHlth = Template.bind({});
 EnumHlth.args = {
   bType: 'Enum',
@@ -152,6 +174,16 @@ EnumHlth.args = {
   enumLabels: ['Ok', 'Warning', 'Alarm'],
   label: 'Enum - HealthKind',
   defaultVal: '1',
+};
+
+export const EnumHlthReadOnly = Template.bind({});
+EnumHlthReadOnly.args = {
+  bType: 'Enum',
+  enumOrdinals: ['1', '2', '3'],
+  enumLabels: ['Ok', 'Warning', 'Alarm'],
+  label: 'Enum - HealthKind',
+  defaultVal: '1',
+  readOnly: true,
 };
 
 export const Timestamp = Template.bind({});
@@ -172,7 +204,15 @@ export const Dbpos = Template.bind({});
 Dbpos.args = {
   bType: 'Dbpos',
   label: 'Double-Point Status',
+  defaultVal: '0',
+};
+
+export const DbposReadOnly = Template.bind({});
+DbposReadOnly.args = {
+  bType: 'Dbpos',
+  label: 'Double-Point Status',
   defaultVal: '2',
+  readOnly: true,
 };
 
 export const Tcmd = Template.bind({});
@@ -180,6 +220,14 @@ Tcmd.args = {
   bType: 'Tcmd',
   label: 'Tap Command',
   defaultVal: '2',
+};
+
+export const TcmdReadOnly = Template.bind({});
+TcmdReadOnly.args = {
+  bType: 'Tcmd',
+  label: 'Tap Command',
+  defaultVal: '3',
+  readOnly: true,
 };
 
 export const EntryTime = Template.bind({});
@@ -206,6 +254,7 @@ OptFlds.args = {
   bType: 'OptFlds',
   label: 'Optional Fields',
   defaultVal: '0000000011',
+  readOnly: false,
 };
 
 export const SvOptFlds = Template.bind({});
@@ -213,6 +262,7 @@ SvOptFlds.args = {
   bType: 'SvOptFlds',
   label: 'Sampled Values Optional Fields',
   defaultVal: '000101',
+  readOnly: true,
 };
 
 export const LogOptFlds = Template.bind({});

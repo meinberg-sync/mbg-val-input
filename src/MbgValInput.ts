@@ -38,6 +38,8 @@ function sanitizeAndValidateInt(
   isUserInput: boolean,
   isSigned = true,
 ) {
+  if (!value) return '';
+
   // allow leading negative sign
   const signed = value[0] === '-' ? '-' : '';
   const negative = signed === '-';
@@ -104,6 +106,8 @@ function sanitizeAndValidateFloat(
   isUserInput: boolean,
   size: 32 | 64,
 ) {
+  if (!value) return '';
+
   let sanitized = '';
 
   // allow leading negative sign
@@ -177,18 +181,20 @@ function sanitizeAndValidateFloat(
 }
 
 function sanitizeOctet(value: string) {
-  return value.replace(/[^0-9a-fA-F]/g, '');
+  return value?.replace(/[^0-9a-fA-F]/g, '');
 }
 
 function sanitizeObjRef(value: string) {
-  return value.replace(/[^A-Za-z0-9_/$]/g, '');
+  return value?.replace(/[^A-Za-z0-9_/$]/g, '');
 }
 
 function sanitizeBitString(value: string) {
-  return value.replace(/[^01]/g, '');
+  return value?.replace(/[^01]/g, '');
 }
 
 function formatTimestamp(input: string) {
+  if (!input) return '';
+
   const digits = input.replace(/\D/g, '');
 
   // Extract parts
@@ -222,6 +228,8 @@ export class MbgValInput extends LitElement {
   `;
 
   @property({ type: String }) bType?: string;
+
+  @property({ type: Boolean }) readOnly = false;
 
   // If the DA/BDA is assigned a Val in DataTypeTemplates
   @property({ type: String }) default = '';
@@ -304,6 +312,7 @@ export class MbgValInput extends LitElement {
         type="text"
         value="${validatedDefault ?? nothing}"
         @input="${this.handleBigIntInput}"
+        ?disabled="${this.readOnly}"
       ></md-outlined-text-field>`;
     }
 
@@ -316,6 +325,7 @@ export class MbgValInput extends LitElement {
       max="${max}"
       value="${validatedDefault ?? nothing}"
       @input="${this.handleIntInput}"
+      ?disabled="${this.readOnly}"
     ></md-outlined-text-field>`;
   }
 
@@ -353,6 +363,7 @@ export class MbgValInput extends LitElement {
         type="text"
         value="${validatedDefault ?? nothing}"
         @input="${this.handleFloatInput}"
+        ?disabled="${this.readOnly}"
       ></md-outlined-text-field>
     `;
   }
@@ -374,6 +385,7 @@ export class MbgValInput extends LitElement {
         value="${sanitizeOctet(this.default) ?? nothing}"
         maxlength="${size * 2}"
         @input="${this.handleOctetInput}"
+        ?disabled="${this.readOnly}"
       ></md-outlined-text-field>
     `;
   }
@@ -394,6 +406,7 @@ export class MbgValInput extends LitElement {
         value="${this.default ?? nothing}"
         maxlength="${size}"
         @input="${this.handleStringInput}"
+        ?disabled="${this.readOnly}"
       ></md-outlined-text-field>
     `;
   }
@@ -410,7 +423,11 @@ export class MbgValInput extends LitElement {
     }
 
     return html`
-      <md-filled-select id="input" label="${this.label}">
+      <md-filled-select
+        id="input"
+        label="${this.label}"
+        ?disabled="${this.readOnly}"
+      >
         ${ordinals.map(
           (ordinal, index) => html`
             <md-select-option
@@ -449,6 +466,7 @@ export class MbgValInput extends LitElement {
         label="${this.label}"
         value="${validatedDefault ?? nothing}"
         @input="${this.handleTimestampInput}"
+        ?disabled="${this.readOnly}"
       ></md-outlined-text-field>
     `;
   }
@@ -470,13 +488,14 @@ export class MbgValInput extends LitElement {
         value="${sanitizeObjRef(this.default) ?? nothing}"
         maxlength="255"
         @input="${this.handleObjRefInput}"
+        ?disabled="${this.readOnly}"
       ></md-outlined-text-field>
     `;
   }
 
   dbposInput() {
     return html`
-      <md-filled-select id="input" label="${this.label}">
+      <md-filled-select id="input" label="${this.label}" ?disabled="${this.readOnly}">
         <md-select-option value="0" ?selected=${this.default === '0'}>
           <div slot="headline">0 - intermediate-state</div>
         </md-select-option>
@@ -497,7 +516,7 @@ export class MbgValInput extends LitElement {
 
   tcmdInput() {
     return html`
-      <md-filled-select id="input" label="${this.label}">
+      <md-filled-select id="input" label="${this.label}" ?disabled="${this.readOnly}">
         <md-select-option value="0" ?selected=${this.default === '0'}>
           <div slot="headline">0 - neutral</div>
         </md-select-option>
@@ -533,6 +552,7 @@ export class MbgValInput extends LitElement {
         value="${sanitizeBitString(this.default) ?? nothing}"
         maxlength="${size}"
         @input="${this.handleBitStringInput}"
+        ?disabled="${this.readOnly}"
       ></md-outlined-text-field>
     `;
   }
@@ -552,7 +572,11 @@ export class MbgValInput extends LitElement {
     return {
       BOOLEAN: html`<label
         >${this.label}
-        <md-switch id="input" ?selected=${xmlBoolean(this.default)}></md-switch
+        <md-switch
+          id="input"
+          ?disabled="${this.readOnly}"
+          ?selected=${xmlBoolean(this.default)}
+        ></md-switch
       ></label>`,
       INT8: this.intInput(8),
       INT16: this.intInput(16),
@@ -576,7 +600,7 @@ export class MbgValInput extends LitElement {
       VisString255: this.stringInput(255),
       Unicode255: this.stringInput(255),
       Quality: this.bitstringInput(14),
-      Currency: currencyInput(this.label, this.default),
+      Currency: currencyInput(this.label, this.default, this.readOnly),
       Enum: this.enumInput(),
       Timestamp: this.timestampInput(),
       ObjRef: this.objrefInput(),
@@ -599,6 +623,7 @@ export class MbgValInput extends LitElement {
         id="input"
         label="${this.label}"
         value="${this.default ?? nothing}"
+        ?disabled="${this.readOnly}"
       ></md-outlined-text-field>`
     );
   }

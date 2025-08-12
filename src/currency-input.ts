@@ -3,9 +3,13 @@ import { html } from 'lit';
 import '@material/web/select/filled-select.js';
 import '@material/web/select/select-option.js';
 
-export function currencyInput(label: string, defaultVal: string) {
+export function currencyInput(
+  label: string,
+  defaultVal: string,
+  readOnly: boolean,
+) {
   return html`
-    <md-filled-select id="input" label="${label}">
+    <md-filled-select id="input" label="${label}" ?disabled="${readOnly}">
       <md-select-option value="AED" ?selected=${defaultVal === 'AED'}>
         <div slot="headline">AED (UAE Dirham)</div>
       </md-select-option>
