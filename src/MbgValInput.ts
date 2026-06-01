@@ -225,6 +225,12 @@ export class MbgValInput extends LitElement {
       max-width: 100%;
       width: auto;
     }
+
+    .boolean-input {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
   `;
 
   @property({ type: String }) bType?: string;
@@ -570,12 +576,13 @@ export class MbgValInput extends LitElement {
 
   get inputs(): Partial<Record<string, TemplateResult>> {
     return {
-      BOOLEAN: html`<label
+      BOOLEAN: html`<label class="boolean-input"
         >${this.label}
         <md-switch
           id="input"
           ?disabled="${this.readOnly}"
           ?selected=${xmlBoolean(this.default)}
+          icons
         ></md-switch
       ></label>`,
       INT8: this.intInput(8),
