@@ -5,7 +5,7 @@ import type { MdSwitch } from '@material/web/switch/switch.js';
 import { currencyInput } from './currency-input.js';
 
 import '@material/web/textfield/outlined-text-field.js';
-import '@material/web/select/filled-select.js';
+import '@material/web/select/outlined-select.js';
 import '@material/web/select/select-option.js';
 import '@material/web/switch/switch.js';
 
@@ -429,7 +429,7 @@ export class MbgValInput extends LitElement {
     }
 
     return html`
-      <md-filled-select
+      <md-outlined-select
         id="input"
         label="${this.label}"
         ?disabled="${this.readOnly}"
@@ -445,7 +445,7 @@ export class MbgValInput extends LitElement {
             </md-select-option>
           `,
         )}
-      </md-filled-select>
+      </md-outlined-select>
     `;
   }
 
@@ -501,7 +501,7 @@ export class MbgValInput extends LitElement {
 
   dbposInput() {
     return html`
-      <md-filled-select id="input" label="${this.label}" ?disabled="${this.readOnly}">
+      <md-outlined-select id="input" label="${this.label}" ?disabled="${this.readOnly}">
         <md-select-option value="0" ?selected=${this.default === '0'}>
           <div slot="headline">0 - intermediate-state</div>
         </md-select-option>
@@ -516,13 +516,13 @@ export class MbgValInput extends LitElement {
         <md-select-option value="3" ?selected=${this.default === '3'}>
           <div slot="headline">3 - bad-state</div>
         </md-select-option>
-      </md-filled-select>
+      </md-outlined-select>
     `;
   }
 
   tcmdInput() {
     return html`
-      <md-filled-select id="input" label="${this.label}" ?disabled="${this.readOnly}">
+      <md-outlined-select id="input" label="${this.label}" ?disabled="${this.readOnly}">
         <md-select-option value="0" ?selected=${this.default === '0'}>
           <div slot="headline">0 - neutral</div>
         </md-select-option>
@@ -537,7 +537,7 @@ export class MbgValInput extends LitElement {
         <md-select-option value="3" ?selected=${this.default === '3'}>
           <div slot="headline">3 - reserved</div>
         </md-select-option>
-      </md-filled-select>
+      </md-outlined-select>
     `;
   }
 

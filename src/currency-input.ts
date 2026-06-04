@@ -1,6 +1,6 @@
 import { html } from 'lit';
 
-import '@material/web/select/filled-select.js';
+import '@material/web/select/outlined-select.js';
 import '@material/web/select/select-option.js';
 
 export function currencyInput(
@@ -9,7 +9,7 @@ export function currencyInput(
   readOnly: boolean,
 ) {
   return html`
-    <md-filled-select id="input" label="${label}" ?disabled="${readOnly}">
+    <md-outlined-select id="input" label="${label}" ?disabled="${readOnly}">
       <md-select-option value="AED" ?selected=${defaultVal === 'AED'}>
         <div slot="headline">AED (UAE Dirham)</div>
       </md-select-option>
@@ -496,6 +496,6 @@ export function currencyInput(
       <md-select-option value="ZWG" ?selected=${defaultVal === 'ZWG'}>
         <div slot="headline">ZWG (Zimbabwe Gold)</div>
       </md-select-option>
-    </md-filled-select>
+    </md-outlined-select>
   `;
 }
