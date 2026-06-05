@@ -4,6 +4,8 @@ import { property, query } from 'lit/decorators.js';
 import type { MdSwitch } from '@material/web/switch/switch.js';
 import { currencyInput } from './currency-input.js';
 
+import { designTokens } from './design-tokens.js';
+
 import '@material/web/textfield/outlined-text-field.js';
 import '@material/web/select/outlined-select.js';
 import '@material/web/select/select-option.js';
@@ -219,19 +221,22 @@ function formatTimestamp(input: string) {
 
 /** Web Component for inputting IEC61850-6 "Val" values */
 export class MbgValInput extends LitElement {
-  static styles = css`
-    md-outlined-text-field.Timestamp {
-      min-width: 250px;
-      max-width: 100%;
-      width: auto;
-    }
+  static styles = [
+    designTokens,
+    css`
+      md-outlined-text-field.Timestamp {
+        min-width: 250px;
+        max-width: 100%;
+        width: auto;
+      }
 
-    .boolean-input {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-  `;
+      .boolean-input {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+    `,
+  ];
 
   @property({ type: String }) bType?: string;
 
